@@ -1,0 +1,274 @@
+# -*- coding: utf-8 -*-
+"""
+Spyder Editor
+
+This is a temporary script file.
+"""
+
+import numpy as np
+import matplotlib.pyplot as plt
+from control.matlab import *
+
+"""Simulation d'un système continu"""
+
+"""Question 1"""
+
+"""On a le vecteur d'état sous la forme X = [[x1, x2, x3, ..... xn]].T
+
+et on a la représentation d'état sous la forme X' = A.X.T+B.U.T (U est le vecteur d'entrée)
+
+
+on va choisir di(t)/dt, dw(t)/dt et dθ(t)/dt pour établir X', X' est la dérivée de X
+
+donc pour obtnir les élements dans X', i(t), w(t) et θ(t) sont obligatoire dans le vecteur d'état
+
+em(t) et γ(t) peuvent remplacer respectivement par w(t) et i(t)
+
+donc on n'a pas besoin d'écrire em(t) et γ(t) dans le vecteur d'état X
+
+finalament, on choisit X = [[i(t), w(t), θ(t)]].T """
+
+
+"""Question 2"""
+
+print("Donc l'équation d'état de ce système est :\n")
+
+print("    [[-R/L, -Ke/L, 0]   [[i(t)],  [[1/L],\n")
+print("X' = [km/J, -fv/J, 0] .  [w(t)], + [0  ] .  [u(t)]\n")
+
+print("     [0   , 1    , 0]]   [θ(t)]]   [0  ]]\n")
+
+
+print("                 [[i(t)],\n")      
+print("Y = [[0, 0, 1]] . [w(t)] + [[0]] .  [u(t)]\n")
+
+print("                  [θ(t)]]\n")
+
+
+
+
+"""Question 3"""
+
+def MCC(R, L, Ke, Km, fv, J, a, b, c):
+    
+    A = [[-R/L, -Ke/L, 0],[Km/J, -fv/J, 0],[0, 1, 0]]
+    B = [[1/L],[0],[0]]
+    C = [[a, b, c]]
+    D = [[0]]
+    S = ss(A, B, C, D)
+    """la fonction ss pour élaborer une représentation d’état"""
+    #Create a state space system from the matrices of its state and
+
+        #output equations:
+
+        #Returns
+
+    #-------
+
+    #out: :class:`StateSpace`
+
+        #The new linear system
+
+    y,T = step(S,np.linspace(0,100,10000))
+
+    """On a un la représentation d'état, on peut avoir la relation entre la sortie
+    en fonction de temps"""
+    
+
+    plt.figure( )
+
+    plt.plot(T.T,y.T) #T dans y.T est la tranposition de matrice y
+
+    if a == 1 :
+
+        plt.xlabel('temps/s')
+
+        plt.ylabel('courant/A')
+        
+        plt.title('la fonction de i=f(t)')
+        
+        plt.xlim([0,0.1]) 
+        """On peut ajouter une limite à l'abscisse donc on peut bien voit cette courant"""
+
+    elif b == 1 :
+
+        plt.xlabel('temps/s')
+
+        plt.ylabel('vitesse angulaire/rad.s-1')
+        
+        plt.title('la fonction de w=f(t)')
+
+    elif c == 1 :
+
+        plt.xlabel('temps/s')
+
+        plt.ylabel('angle de moteur/rad')
+        
+        plt.title('la fonction de θ=f(t)')
+
+
+
+    H = ss2tf(S)
+    """On utilise "ss2tf" pour obtenir la fonction de transfert H
+    de ce système de sa représentation d'état S"""
+    if a == 1 :
+        print("la fonction de transfert qui relie u(t) à i(t) est \n",H)
+
+    elif b == 1 :
+
+        print("la fonction de transfert qui relie u(t) à w(t) est \n",H)
+    elif c == 1 :
+
+        print("la fonction de transfert qui relie u(t) à θ(t) est \n",H)
+    
+
+
+
+""""Question4"""
+
+a = 1; b = 0; c = 0 #Ici on peut changer la matrice C
+if a == 1 :
+
+    MCC(1.52, 2.2e-3, 0.127, 0.127, 5.06e-5, 8.3e-5, 1, 0, 0)
+    """Ici on peut constater qu'il y a pic de courant lorsque temps t est proche de 0,
+parce que c'est le moment du démarrage du moteur. 
+Dans le circuit on a le courant d'enclenchement"""
+elif b == 1 :
+
+    MCC(1.52, 2.2e-3, 0.127, 0.127, 5.06e-5, 8.3e-5, 0, 1, 0) 
+    """On a une vitesse angulaire de moteur constante, θ = w*t, c'est une équation linéaire"""
+                   
+elif c == 1 :
+
+    MCC(1.52, 2.2e-3, 0.127, 0.127, 5.06e-5, 8.3e-5, 0, 0, 1)
+    """Après le démarrage, la tension de moteur est une constante,
+la vitesse angulaire est proportionnelle à la tension d'entrée donc il est une constante"""
+  
+
+
+  
+"""Question5"""
+
+"""On étudie la fonction de transfert du moteur qui relie l'entrée u(t) à la vitesse
+angualaire w(t), donc ici on a b = 1, a,c = 0"""
+a = 0; b = 1; c = 0
+if a == 1 :
+
+    MCC(1.52, 2.2e-3, 0.127, 0.127, 5.06e-5, 8.3e-5, 1, 0, 0)
+elif b == 1 :
+
+    MCC(1.52, 2.2e-3, 0.127, 0.127, 5.06e-5, 8.3e-5, 0, 1, 0)                     
+elif c == 1 :
+
+    MCC(1.52, 2.2e-3, 0.127, 0.127, 5.06e-5, 8.3e-5, 0, 0, 1)
+    
+
+
+
+"""Question6"""
+""" C'est un système numérique, il est une relation récurrente entrée-sortie entre une suite
+excitatrice u(k) et une suite de sortie y(k), donc on a besoin de savoir tous les états d'entrées
+u(k), après on a besoin de connaître la condition initialle, c'est-à-dire y(0) et y(1) donc on 
+pourrait faire la itération entre l'entrée et la sortie."""
+
+
+
+
+"""Question7"""
+
+N = 50
+t = np.arange(0,N)       
+def equ2(N):
+    U = np.ones(N)
+    y = np.zeros(N)
+    for nb in range(0,N-2):
+       y[nb+2] = U[nb]+0.1*y[nb+1]-0.7*y[nb]
+       """On simule l'équation récurrente"""
+    plt.plot(t,y)
+    plt.xlabel("Nombre N")
+    plt.ylabel("La suite de sortie y[k]")
+    plt.grid()
+    plt.title("y[k] en fonction de k")
+
+
+"""Question8"""
+plt.figure()
+equ2(N)
+
+
+
+
+"""Question9"""
+num = [1]
+den = [1, -0.1, 0.7]
+H1 = tf(num,den,1) 
+""" 1 est la période d'échantillonnage"""
+
+y,T = step(H1,np.linspace(0,N,N+1))
+plt.figure()
+plt.plot(T.T,y.T)
+plt.xlabel("temps")
+plt.ylabel("La suite de sortie y")
+plt.grid()
+plt.title("l'échantillonnage de y en fonction de t")
+
+
+
+"""Question 10"""
+
+def Représentation():
+    A = [[0 ,1],[-0.7, 0.1]]
+    B = [[0],[1]]
+    C = [[1,0]]
+    D = [[0]]
+    R1 = ss(A, B, C, D, 1)
+    #ss(A, B, C, D[, dt])
+    y,T = step(R1,np.linspace(0,N,N+1))
+    plt.figure()
+    plt.plot(T.T,y.T)
+    plt.xlabel("k")
+    plt.ylabel("La suite de sortie y")
+    plt.grid()
+    plt.title("La représentation d'état R1") 
+    return R1
+R1 = Représentation()
+
+
+"""Question 11"""
+"""y(k + 2) - 0.1*y(k + 1) + 0.7*y(k) = u(k)"""
+
+def ss2tf_sys(R1):
+    H2 = ss2tf(R1)
+    print("la fonction de transfert du système précédent est \n", H2)
+    
+ss2tf_sys(R1)
+"""On a bien la même fonction de transfert du système précédent"""
+
+
+
+
+"""Question 12"""
+R2 = tf2ss(H1)
+print("la représentation d'état de la fonction de transfère H1 est \n", R2)
+print("la représentation d'état de système est \n", R1)
+y1,T1 = step(R1,np.linspace(0,N,N+1))
+y2,T2 = step(R2,np.linspace(0,N,N+1))
+
+plt.figure()
+
+plt.plot(T1.T,y1.T)
+plt.xlabel("y")
+plt.ylabel("temps")
+plt.grid()
+plt.title("La représentation d'état R1")
+
+
+plt.figure()
+plt.plot(T2.T,y2.T)
+plt.xlabel("y")
+plt.ylabel("temps")
+plt.grid()
+plt.title("La représentation d'état R2")
+
+"""R1 et R2 ne sont pas les mêmes car le choix des vecteurs d'état est différent.
+Mais les deux représentations sont correctes, donc un système a plusieurs représentations d'état""" 
