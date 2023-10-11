@@ -151,14 +151,35 @@ FiltreExponentiel(signal, 0.01,0.1,0.5)
 partie 2.5
 """
 
-def Mafonction():
-    
-    x = np.linspace(-20,20,200)
+def Mafonction(x):
 
-    y = 0.8-np.exp((-(x-3)*(x-3)-5)/100-np.sin(pi*(x/30+1)))    
-             
-    plt.plot(x,y)
+    return 0.8-(np.exp((-(x-3)**2-5)/100)-np.sin(pi*(x/30+1)))    
+plt.figure()            
+x1  = np.linspace(-52,20,73)
+plt.plot(x1,Mafonction(x1))
+
+"""solve systems of nonlinear Equation in Python by using FSOLVE"""
+
+print("f(x) = 0 pour x = ", resol.fsolve(Mafonction,0))
+
+"""fsolve(nonlinearEquation, initialGuess)"""
+"""initialGuess est le point que l'on pense pour trouver la racine (the root)
+d'une équation"""
+
+
+minimum = resol.fmin(Mafonction,20)
     
 
-plt.figure()    
-Mafonction()
+print("La valeur qui est plus proche de 20 est",minimum[0])
+
+
+def func(x):
+    y = x + 2 * np.cos(x)
+    return y
+
+plt.figure()            
+x  = np.linspace(-52,20,73)
+plt.plot(x,func(x))
+
+y = resol.fsolve(func, 0.2)
+print(y)
