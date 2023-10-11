@@ -1,0 +1,164 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Oct 4 15:10:56 2023
+
+@author: zhanpeng.xi@etu.umontpellier.fr
+"""
+
+import math as m
+import matplotlib.pyplot as plt
+import numpy as np
+import random as rand
+import scipy.optimize as resol 
+from numpy import pi
+
+delta_t = 0.01
+nombre_echantillons = 1000
+temps = np.arange(0,nombre_echantillons)*delta_t
+signal = 1.9*np.sin(5*temps)+ 1.5*np.sin(11*temps)+1.7*np.sin(2.3*temps)
+signal = signal + np.sqrt(0.3)*np.random.randn(np.size(temps))
+
+def recursive(entree, a):
+
+    y = np.zeros(nombre_echantillons)
+
+    for nb in range(0,nombre_echantillons):
+
+        y[nb]=a*entree[nb]+(1-a)*y[nb-1]
+    
+
+    plt.subplot(2,1,1)
+
+    plt.plot(temps,signal)
+
+    plt.xlabel('temps')
+
+    plt.ylabel('sortie')
+
+    plt.title('avant le filtre')
+    
+    
+
+    plt.subplot(2,1,2)
+
+    plt.plot(temps,y)
+
+    plt.xlabel('temps')
+
+    plt.ylabel('sortie')
+
+    plt.title('après le filtre')
+
+   
+recursive(signal, 0.01)
+
+
+
+   
+# fonction
+def myFun(*args):
+
+    for a in args:
+
+        print(a)
+# Implémentation
+myFun('Hello', 'Welcome', 'to', 'GeeksforGeeks')
+
+"""def recursive2(*variable):
+
+    nb1 = 0
+
+    nb2 = 0
+
+    y = np.zeros(nombre_echantillons)
+
+    fig, axs = plt.subplots(2, 2)
+
+    for a in variable:
+        
+        for nb in range(0, nombre_echantillons):
+
+            y[nb]=a*signal[nb]+(1-a)*y[nb-1] 
+
+    axs[nb1,nb2].plot(temps,signal)
+
+    plt.xlabel('temps')
+
+    plt.ylabel('sortie')
+
+    plt.title('avant le filtre')
+
+
+
+    axs[nb1+1,nb2].plot(temps,y[nb])
+
+    plt.xlabel('temps')
+
+    plt.ylabel('sortie')
+
+    plt.title('après le filtre')
+
+    nb2 += 1
+recursive2(0.1,0.2)"""
+
+def FiltreExponentiel(*variable):
+    plt.subplot(2,1,1)
+        
+    plt.plot(temps,signal)
+        
+    plt.xlabel('temps')
+        
+    plt.ylabel('sortie')
+        
+    plt.title('avant le filtre')
+    
+    entree = variable[0]
+
+    y = np.zeros(nombre_echantillons)
+    
+    if len(variable) == 1:
+        
+        a = 0.4
+    
+    else:
+        for x in range(1,len(variable)):
+            
+            a = variable[x]
+    
+    
+    
+            for nb in range(nombre_echantillons):
+
+                y[nb]=a*entree[nb]+(1-a)*y[nb-1]
+            
+            
+            plt.subplot(2,1,2)
+        
+            plt.plot(temps,y)
+        
+            plt.xlabel('temps')
+        
+            plt.ylabel('sortie')
+        
+            plt.title('après le filtre')
+
+plt.figure()    
+FiltreExponentiel(signal, 0.01,0.1,0.5)
+
+
+"""
+partie 2.5
+"""
+
+def Mafonction():
+    
+    x = np.linspace(-20,20,200)
+
+    y = 0.8-np.exp((-(x-3)*(x-3)-5)/100-np.sin(pi*(x/30+1)))    
+             
+    plt.plot(x,y)
+    
+
+plt.figure()    
+Mafonction()
