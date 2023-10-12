@@ -1,0 +1,186 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Oct 12 09:55:57 2023
+
+@author: zhanpeng.xi@etu.umontpellier.fr
+"""
+
+import numpy as np
+import matplotlib.pyplot as plt
+from control.matlab import *
+import control as crtl
+from scipy import signal
+
+
+"""Question 1"""
+
+R = 1; L = 4e-3; Ke = 0.1 ; Km = 0.1 ; fv = 3e-3 ; J = 2e-3   
+
+A = [[-R/L, -Ke/L, 0],[Km/J, -fv/J, 0],[0, 1, 0]]
+B = [[1/L],[0],[0]]
+C = [[0, 0, 1]]
+D = [[0]]
+
+print("La matrice C est\n", C)
+print("La matrice D est\n", D)
+
+"""Question 2"""
+
+def MCC(R, L, Ke, Km, fv, J):
+    
+    A = [[-R/L, -Ke/L, 0],[Km/J, -fv/J, 0],[0, 1, 0]]
+    B = [[1/L],[0],[0]]
+    C = [[0, 0, 1]]
+    D = [[0]]
+    S = ss(A, B, C, D)
+    """la fonction ss pour élaborer une représentation d’état"""
+
+    y,T = step(S)
+    """On a un la représentation d'état, on peut avoir la relation entre la sortie
+en fonction de temps"""
+    
+    #Parameters
+    #    ----------
+    #    sys: StateSpace, or TransferFunction
+    #        LTI system to simulate
+    
+    #    T: array-like or number, optional
+    #        Time vector, or simulation time duration if a number (time vector is
+    #        autocomputed if not given)
+        
+    #    X0: array-like or number, optional
+    #        Initial condition (default = 0)
+        
+    #        Numbers are converted to constant arrays with the correct shape.
+    
+    #Returns
+    #    -------
+    #    yout: array
+    #        Response of the system
+        
+    #    T: array
+    #        Time values of the output
+        
+    #    xout: array (if selected)
+    #        Individual response of each x variable
+    plt.plot(T,y)
+    plt.xlabel("temps")
+    plt.ylabel("La réponse à un échelon unitaire du système")
+    plt.grid()
+    plt.title("y = f(t)")
+    plt.show()
+
+
+    
+    H = ss2tf(S)
+    """On utilise "ss2tf" pour obtenir la fonction de transfert H
+    de ce système de sa représentation d'état S"""
+    print("la fonction de transfert qui relie u(t) à θ(t) est \n",H)
+    
+    return H
+
+
+"""Question 3"""    
+#On appelle la fonction MCC    
+H = MCC(1, 4e-3, 0.1, 0.1, 3e-3, 2e-3)
+
+
+"""Question 4"""
+
+
+Reso = crtl.pole(H)
+print("Les pôles de cette fonction de transfert est \n", Reso)
+
+print("le système n'est pas stable parce que on a un pôle qui est égal à 0, et un système est stable si et seulement si toutes les parties réelles des pôles sont strictement négative.\n")
+
+
+
+
+
+"""Question 5"""
+
+CoMatrice = ctrb(A, B)
+determinant = np.linalg.det(CoMatrice)
+print("Ce système est commandable parce que le determinant de sa matrice commandable est", determinant)
+
+
+
+"""Question 6"""
+
+λ = np.array([-10,-20,-100])
+K = place(A, B, λ)
+#Parameters
+#    ----------
+#    A : 2D array
+#        Dynamics matrix
+#    B : 2D array
+#        Input matrix
+#    p : 1D list
+#        Desired eigenvalue locations (Les valeurs propre)
+    
+#    Returns
+#    -------
+#    K : 2D array (or matrix)
+#        Gain such that A - B K has eigenvalues given in p
+#        An ( la nouvelle matrice dynamique) = A- B K
+
+print("\nLa matrice K est \n", K)
+
+"""Question 7"""
+print("\nOn a le nouveau retour d'éat u = r -Kx,\non a donc x' = (A-B*K)x+Br\n")
+
+
+A = A-B@K
+print("la nouvelle matrice A est\n",A)
+S = ss(A, B, C, D)
+y,T = step(S)
+plt.plot(T,y)
+plt.xlabel("temps")
+plt.ylabel("La réponse à un échelon unitaire du système\n en boucle fermée avec retour d'état")
+plt.grid()
+plt.title("y = f(t)")
+plt.show()
+
+H = ss2tf(S)
+Reso = crtl.pole(H)
+print("Les pôles de cette fonction de transfert est \n", Reso)
+
+print("le système est stable parce que toutes les parties réelles des pôles sont strictement négative.\n")
+
+
+
+
+"""Questiob 8"""
+A = np.array([[-R/L, -Ke/L, 0],[Km/J, -fv/J, 0],[0, 1, 0]])
+z = np.array([[0],[0],[0]])
+A = np.block([A,z])
+
+C = np.array([[0, 0, -1]])
+z = np.array([0])
+C = np.block([C,z])
+
+A = np.block([[A],[C]])# la matrice Â
+
+B = np.array([[1/L],[0],[0]])
+B = np.block([[B],[z]])# la matrice B chapeau
+
+K = np.block([[K,1]])
+
+A = A - B*K
+C = np.array([[0, 0, -1]])
+z = np.array([[0,0,0],[0,0,0],[0,0,0]])
+C = np.block([[z],[C]])
+z = np.array([[0],[0],[0],[0]])
+C = np.block([[z,C]])
+D = np.block([[0],[0],[0],[0]])
+
+S = ss(A,B,C,D) 
+y,T = step(S)
+plt.figure()
+plt.plot(T,y)
+plt.xlabel("temps")
+plt.ylabel("La réponse à un échelon unitaire du système\n en boucle fermée avec retour d'état")
+plt.grid()
+plt.title("y = f(t)")
+plt.show()
