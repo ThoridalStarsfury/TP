@@ -19,20 +19,6 @@
 ----------------------------------------------------------------------------------
 
 
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-use IEEE.std_logic_arith.all;
-use IEEE.std_logic_unsigned.all;
-
--- Uncomment the following library declaration if using
--- arithmetic functions with Signed or Unsigned values
---use IEEE.NUMERIC_STD.ALL;
-
--- Uncomment the following library declaration if instantiating
--- any Xilinx leaf cells in this code.
---library UNISIM;
---use UNISIM.VComponents.all;
-
 entity M1TP3 is
     Port ( ReqV : in STD_LOGIC;
            ReqH : in STD_LOGIC;
@@ -49,13 +35,14 @@ architecture Behavioral of M1TP3 is
     type etattype is (A, B, C, D);
     signal present_etat, next_etat : etattype;
     signal cpt : STD_LOGIC_vector (3 downto 0);
+    signal x1,x2 : STD_LOGIC;
 begin
     boucle : process(present_etat,ReqH,ReqV,cpt)
     begin
         case present_etat is
             when A => RH <= '1'; YH <= '0';VH <= '0';
                       RV <= '0'; YV <= '0';VV <= '1';
-                if (ReqV = '1'and cpt = "0011") or cpt = "1110" then next_etat <= B;
+                if (x1 = '1' and cpt = "0011") or cpt = "1110" then next_etat <= B;
                 else next_etat <= A;
                 end if;
             when B => RH <= '1'; YH <= '0';VH <= '0';
@@ -65,7 +52,7 @@ begin
                 end if;   
             when C => RH <= '0'; YH <= '0';VH <= '1';
                       RV <= '1'; YV <= '0';VV <= '0';
-                if (ReqH = '1'and cpt = "0011") or cpt = "1110" then next_etat <= D;
+                if (x2 = '1' and cpt = "0011") or cpt = "1110" then next_etat <= D;
                 else next_etat <= C;
                 end if;
             when D => RH <= '0'; YH <= '1';VH <= '0';
@@ -80,10 +67,12 @@ begin
     
     cycle: process(clk, ReqH, ReqV)
     begin
-            if ReqH = '1' or ReqV = '1' then cpt <="0000";
+            if ReqH = '1' then x2 <= '1'; cpt <= "0000" ;
+            elsif ReqV = '1' then x1 <= '1'; cpt <= "0000" ;
             elsif (clk'event and clk = '1') then
                     present_etat <= next_etat;
-                    if present_etat /= next_etat then cpt <= "0000";
+                    if present_etat /= next_etat then cpt <= "0000"; 
+                    elsif present_etat = B or present_etat = D then x1 <='0'; x2<='0';
                     else cpt <= cpt + 1;
                     end if;
             end if;
