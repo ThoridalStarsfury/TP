@@ -1,0 +1,80 @@
+----------------------------------------------------------------------------------
+-- Company: 
+-- Engineer: 
+-- 
+-- Create Date: 2023/10/13 20:34:23
+-- Design Name: 
+-- Module Name: M1TP3_sm - Behavioral
+-- Project Name: 
+-- Target Devices: 
+-- Tool Versions: 
+-- Description: 
+-- 
+-- Dependencies: 
+-- 
+-- Revision:
+-- Revision 0.01 - File Created
+-- Additional Comments:
+-- 
+----------------------------------------------------------------------------------
+
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+-- Uncomment the following library declaration if using
+-- arithmetic functions with Signed or Unsigned values
+--use IEEE.NUMERIC_STD.ALL;
+
+-- Uncomment the following library declaration if instantiating
+-- any Xilinx leaf cells in this code.
+--library UNISIM;
+--use UNISIM.VComponents.all;
+
+entity M1TP3_sm is
+--  Port ( );
+end M1TP3_sm;
+
+architecture Behavioral of M1TP3_sm is
+component tp3
+    Port ( ReqV : in STD_LOGIC;
+           ReqH : in STD_LOGIC;
+           clk : in STD_LOGIC;
+           RH : out STD_LOGIC;--le feu horizontal est rouge
+           YH : out STD_LOGIC;--le feu horizontal est jaune
+           VH : out STD_LOGIC;--le feu horizontal est vert
+           RV : out STD_LOGIC;--le feu vertical est rouge
+           YV : out std_logic;--le feu vertical est jaune
+           VV : out std_logic);--le feu vertical est vert
+ end component ; 
+ 
+ 
+ signal ReqV,ReqH,clk,RH,YH,VH,RV,YV,VV : STD_LOGIC;
+ 
+begin
+    c1 : tp3 port map(ReqV,ReqH,clk,RH,YH,VH,RV,YV,VV);
+    
+    
+    clock : process
+    begin
+        clk  <= '0';
+        wait for 20 ns;
+        clk  <= '1';
+        wait for 20 ns;
+     end process clock;
+        
+    tb : process
+    begin
+        ReqV <= '0'; ReqH <= '0';
+        wait for 1280 ns;--40*16*2 = 1280 ns, s'il n'y a aucunne influence sur les feux dans une cycle
+        ReqV <= '1'; ReqH <= '0';-- on fait l'influence sur les feux verts verticals
+        wait for 10 ns;--ReqV est une impulsion
+      --  ReqV <= '0'; ReqH <= '0';
+       -- wait for 100 ns;--30+40*2+40*2 = 190 ns, et les feux verticals deviennent rouges
+        --ReqV <= '1'; ReqH <= '0';-- on fait l'influence sur les feux verts verticals
+       -- wait for 10 ns;--ReqV est une impulsion
+        --ReqV <= '0'; ReqH <= '0';
+        --wait for 100 ns;--30+40*2+40*2 = 190 ns, et les feux verticals deviennent rouges
+    end process tb;        
+
+end Behavioral;
