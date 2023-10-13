@@ -1,0 +1,91 @@
+----------------------------------------------------------------------------------
+-- Company: 
+-- Engineer: 
+-- 
+-- Create Date: 2023/10/13 06:48:52
+-- Design Name: 
+-- Module Name: M1TP3 - Behavioral
+-- Project Name: 
+-- Target Devices: 
+-- Tool Versions: 
+-- Description: 
+-- 
+-- Dependencies: 
+-- 
+-- Revision:
+-- Revision 0.01 - File Created
+-- Additional Comments:
+-- 
+----------------------------------------------------------------------------------
+
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.std_logic_arith.all;
+use IEEE.std_logic_unsigned.all;
+
+-- Uncomment the following library declaration if using
+-- arithmetic functions with Signed or Unsigned values
+--use IEEE.NUMERIC_STD.ALL;
+
+-- Uncomment the following library declaration if instantiating
+-- any Xilinx leaf cells in this code.
+--library UNISIM;
+--use UNISIM.VComponents.all;
+
+entity M1TP3 is
+    Port ( ReqV : in STD_LOGIC;
+           ReqH : in STD_LOGIC;
+           clk : in STD_LOGIC;
+           RH : out STD_LOGIC;--le feu horizontal est rouge
+           YH : out STD_LOGIC;--le feu horizontal est jaune
+           VH : out STD_LOGIC;--le feu horizontal est vert
+           RV : out STD_LOGIC;--le feu vertical est rouge
+           YV : out std_logic;--le feu vertical est jaune
+           VV : out std_logic);--le feu vertical est vert
+end M1TP3;
+
+architecture Behavioral of M1TP3 is
+    type etattype is (A, B, C, D);
+    signal present_etat, next_etat : etattype;
+    signal cpt : STD_LOGIC_vector (3 downto 0);
+begin
+    boucle : process(present_etat,ReqH,ReqV,cpt)
+    begin
+        case present_etat is
+            when A => RH <= '1'; YH <= '0';VH <= '0';
+                      RV <= '0'; YV <= '0';VV <= '1';
+                if (ReqV = '1'and cpt = "0011") or cpt = "1110" then next_etat <= B;
+                else next_etat <= A;
+                end if;
+            when B => RH <= '1'; YH <= '0';VH <= '0';
+                      RV <= '0'; YV <= '1';VV <= '0';
+                if cpt = "0010" then next_etat <= C;
+                else next_etat <= B;
+                end if;   
+            when C => RH <= '0'; YH <= '0';VH <= '1';
+                      RV <= '1'; YV <= '0';VV <= '0';
+                if (ReqH = '1'and cpt = "0011") or cpt = "1110" then next_etat <= D;
+                else next_etat <= C;
+                end if;
+            when D => RH <= '0'; YH <= '1';VH <= '0';
+                      RV <= '1'; YV <= '0';VV <= '0';
+                if cpt = "0010" then next_etat <= A;
+                else next_etat <= D;
+                end if;   
+        end case;
+    end process boucle;
+
+
+    
+    cycle: process(clk, ReqH, ReqV)
+    begin
+            if ReqH = '1' or ReqV = '1' then cpt <="0000";
+            elsif (clk'event and clk = '1') then
+                    present_etat <= next_etat;
+                    if present_etat /= next_etat then cpt <= "0000";
+                    else cpt <= cpt + 1;
+                    end if;
+            end if;
+    end process cycle;
+end Behavioral;
