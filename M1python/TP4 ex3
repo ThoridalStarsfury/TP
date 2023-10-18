@@ -1,0 +1,134 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Oct 18 13:48:21 2023
+
+@author: zhanpeng.xi@etu.umontpellier.fr
+"""
+
+import math as m
+import matplotlib.pyplot as plt
+import numpy as np
+import random as rand
+import scipy.optimize as resol 
+from numpy import pi
+
+    
+##Histo, Mode = Histogramme(Data, Intervalle, NombreDeCellules)
+
+FichierDeDonnee = open("Echantillons.txt",'r')
+dataFromFicher = FichierDeDonnee.readlines()
+X = [float(element) for element in dataFromFicher]
+FichierDeDonnee.close()
+
+
+def Histogramme(*variable):
+    nbv = len(variable) #On veut savoir le longeur de variable
+    if nbv == 0:
+        print("le minimum de nombre de variable est 1\n")
+    elif nbv == 1:
+        Data = variable[0]
+        NombreDeCellules = 10
+        #global Intervalle
+        Intervalle = np.arange(min(Data),max(Data),(max(Data)-min(Data))/(NombreDeCellules-1))
+        h = np.zeros(NombreDeCellules)
+        z = 0
+        for x in np.arange(min(Data),max(Data),(max(Data)-min(Data))/(NombreDeCellules-1)):#tous les sous intervalles Ik(k de 1 à p)
+            for y in range(0,len(Data)-1):
+                if Data[y] >= x and Data[y] < x+(max(Data)-min(Data))/(NombreDeCellules-1):
+                    #On vérifie si les valeurs dans "Data" est appartient à l'intervalle [x,x+Δx]
+                    h[z] = h[z]+1
+        z = z + 1 #On finit de la compte à l'intervalle [x,x+Δx]
+        
+        return h
+    elif nbv == 2:
+        Data = variable[0]
+        Intervalle = variable[1]
+        NombreDeCellules = 10
+        h = np.zeros(NombreDeCellules)
+        z = 0
+        for x in np.arange(Intervalle):#tous les sous intervalles Ik(k de 1 à p)
+            for y in range(0,len(Data)-1):
+                if Data[y] >= x and Data[y] < x+(max(Data)-min(Data))/(NombreDeCellules-1):
+                    #On vérifie si les valeurs dans "Data" est appartient à l'intervalle [x,x+Δx]
+                    h[z] = h[z]+1
+        z = z + 1 #On finit de la compte à l'intervalle [x,x+Δx]
+        
+        return h
+    elif nbv == 3:
+        Data = variable[0]
+        Intervalle = variable[1]
+        NombreDeCellules = variable[2]
+        h = np.zeros(NombreDeCellules)
+        z = 0
+        for x in np.arange(Intervalle):#tous les sous intervalles Ik(k de 1 à p)
+            for y in range(0,len(Data)-1):
+                if Data[y] >= x and Data[y] < x+(max(Data)-min(Data))/(NombreDeCellules-1):
+                    #On vérifie si les valeurs dans "Data" est appartient à l'intervalle [x,x+Δx]
+                    h[z] = h[z]+1
+        z = z + 1 #On finit de la compte à l'intervalle [x,x+Δx]
+        
+        return h
+    else:
+        print("le maximum de nombre de variable est 3\n")
+
+
+
+Histogramme(X)            
+                
+                
+            
+        
+        
+
+a=min(X);b=max(X)
+NombreDeCellules = 10
+pas = (max(X)-min(X))/(NombreDeCellules-1)
+Intervalle = np.arange(min(X),max(X),(max(X)-min(X))/(NombreDeCellules-1))
+        
+        
+    
+
+
+ 
+"""NombreDeCellules = 501
+Intervalle = np.linspace(-5,5,NombreDeCellules)
+Histo, Mode = np.histogram(X, Intervalle, NombreDeCellules)
+
+
+
+Mode1 = Mode.reshape(1,501)
+Histo1 = Histo.reshape(1,500)"""
+
+
+
+
+#np.bar(x, height, width=0.8, bottom=None, *, align='center', data=None, **kwargs)
+"""    Parameters
+    ----------
+    x : float or array-like
+        The x coordinates of the bars. See also *align* for the
+        alignment of the bars to the coordinates.
+    
+    height : float or array-like
+        The height(s) of the bars.
+    
+    width : float or array-like, default: 0.8
+        The width(s) of the bars.
+    
+    bottom : float or array-like, default: 0
+        The y coordinate(s) of the bars bases.
+    
+    align : {'center', 'edge'}, default: 'center'
+        Alignment of the bars to the *x* coordinates:
+    
+        - 'center': Center the base on the *x* positions.
+        - 'edge': Align the left edges of the bars with the *x* positions.
+    
+        To align the bars on the right edge pass a negative *width* and
+        ``align='edge'``.
+    
+    Returns
+    -------
+    `.BarContainer`
+        Container with all the bars and optionally errorbars."""
