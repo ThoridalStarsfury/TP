@@ -1,0 +1,30 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
+
+entity addtionneur is
+    Port ( i_A : in STD_LOGIC_VECTOR (3 downto 0);
+           i_B : in STD_LOGIC_VECTOR (3 downto 0);
+           CLK : in STD_LOGIC;
+           RST : in STD_LOGIC;
+           o_Q : out STD_LOGIC_VECTOR (4 downto 0));
+end addtionneur;
+
+architecture Behavioral of addtionneur is
+
+begin
+
+process(CLK,RST)
+begin
+    if(RST='1') then
+            o_Q <= "00000";
+    elsif(CLK'event AND CLK='1') then
+            o_Q <= std_logic_vector(('0' & unsigned(i_A)) + ('0' & unsigned(i_B)));-- On rajoute des bits manqués comme '0'        
+    end if;
+end process;
+
+
+
+end Behavioral;
+
+--main fonction
