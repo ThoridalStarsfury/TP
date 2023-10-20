@@ -1,0 +1,37 @@
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.std_logic_arith.all;
+USE IEEE.std_logic_unsigned.all;
+
+
+entity M1TP4 is
+    Port ( start : in STD_LOGIC;
+           clk : in STD_LOGIC;
+           y : out STD_LOGIC);
+end M1TP4;
+
+architecture Behavioral of M1TP4 is
+signal cpt : std_logic_vector(2 downto 0);
+signal processus : std_logic :='0';
+begin
+    Gen7:process(start,clk)
+    begin
+        if (start = '1' and processus = '0') then
+            cpt <= "000";
+            processus <= '1';
+        elsif (rising_edge(clk) and cpt < "111") and processus = '1' then
+            y <= '1';
+            cpt <= cpt + 1;
+        elsif (falling_edge(clk) and cpt < "111") and processus = '1' then
+            y <= '0';
+        else
+            y <= '0';
+            processus <= '0';
+    
+        end if;
+    end process Gen7;
+        
+        
+    
+end Behavioral;
