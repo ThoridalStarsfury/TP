@@ -1,0 +1,54 @@
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.std_logic_arith.all;
+USE IEEE.std_logic_unsigned.all;
+
+-- Uncomment the following library declaration if using
+-- arithmetic functions with Signed or Unsigned values
+--use IEEE.NUMERIC_STD.ALL;
+
+-- Uncomment the following library declaration if instantiating
+-- any Xilinx leaf cells in this code.
+--library UNISIM;
+--use UNISIM.VComponents.all;
+
+entity M1TP4_sm is
+--  Port ( );
+end M1TP4_sm;
+
+architecture Behavioral of M1TP4_sm is
+    component M1TP4
+    port (start : in STD_LOGIC;
+          clk : in STD_LOGIC;
+          y : out STD_LOGIC);
+    end component;
+    
+    signal start,clk,y :STD_LOGIC;
+    
+begin
+    c1 : M1TP4 port map(start,clk,y);
+    
+ clock : process
+       begin
+           clk  <= '0';
+           wait for 10 ns;
+           clk  <= '1';
+           wait for 10 ns;
+        end process clock;
+        
+     gen7:process
+     begin
+        start <= '0';
+        wait for 15 ns;
+        start <= '1';
+        wait for 3 ns;
+        start <= '0';
+        wait for 21 ns;
+        start <= '1';
+        wait for 3 ns;
+        start <= '0';
+        wait;
+     end process gen7;   
+
+end Behavioral;
