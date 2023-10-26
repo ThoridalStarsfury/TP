@@ -1,0 +1,227 @@
+# -*- coding: utf-8 -*-
+"""
+Spyder Editor
+
+This is a temporary script file.
+"""
+
+
+import numpy as np
+import matplotlib.pyplot as plt
+from control.matlab import *
+import control as crtl
+from scipy import signal
+
+
+"""Question 1, 2 et 3"""
+print('Question 1, 2 et 3\n')
+
+def systeme():
+    A = np.array([[0, 0, 1],[1, -1, 2],[-6, 0, -5]])
+    B = np.array([[1],[2],[1]])
+    C = np.array([[1, 1, 1]])
+    D = np.array([[0]])
+    
+    S = ss(A,B,C,D)
+    """la fonction ss pour élaborer une représentation d’état"""
+    
+    y,T =step(S) 
+    """On a un la représentation d'état, on peut avoir la relation entre la sortie
+en fonction de temps"""
+    plt.plot(T,y,label='la simulation de ce système pour une entrée échelon')
+    plt.xlabel('temps')
+    plt.ylabel('la réponse de ce système')
+    plt.legend()
+    plt.grid()
+    plt.show()
+    
+    res = obsv(A,C)
+    """Returns
+    -------
+    O : 2D array (or matrix)
+        Observability matrix"""
+    return res
+
+
+
+res = systeme()
+
+"""Question 4"""
+print('Question 4\n')
+
+print("On étudie la dynamique d'erreur e(e' en fonction de e)\n")
+print("Dans l'observateur, on veut l'écart entre x(t)(système réel) et ^x(t)(x châpeau dans le système d'observateur est nul\n")
+print("On a : X' = A*X+B*U (système réel) et ^X' = A*^X + B*U + L*(y-^y)(système d'observateur)\nOn a donc e' = X'-^X' = (A*X+B*U) - (A*^X + B*U + L*(y-^y))\n")
+print("e' = A*(X-^X)-L*C*(X-^X) = (A-L*C)*(X-^X)\n")
+print("On a donc M = A - L*C\nde/dt = (A-L*C)*e => 1/e.de = (A-L*C).dt => ∫1/e.de = ∫(A-L*C).dt => ln(e) = (A-L*C)*t+cte => e = exp((A-L*C)*t+cte) = Cste*exp((A-L*C)*t) où Cste est une constante\n")
+print("Si on veut estimer les vecteurs d'état sans mesurer, il faut e -> 0, donc (A-L*C) à partie réelle < 0, on calcul le déterminant de (A-L*C) = 0 pour tous les valeurs propre de (A-L*C) sont inférieures à 0 \n")
+
+"""Question 5"""
+print('Question 5')
+λ = np.array([-4,-5,-6])
+
+print("après ajouter la matrice L, l'observateur doit être stable\n")
+def trL():
+    A = np.array([[0, 0, 1],[1, -1, 2],[-6, 0, -5]])
+    B = np.array([[1],[2],[1]])
+    C = np.array([[1, 1, 1]])
+    D = np.array([[0]])
+    #M = A - L*C
+    
+    K = place(A.T,C.T,λ)#K est la transposé de matrice L
+    # la valeur propre d'une matrice A = la valeur propre de la matrice A.T
+    
+    return K
+
+K = trL()
+
+L = K.T
+
+print("On a la matrice L est\n",L)
+
+
+"""Question 6"""
+print('Question 6')
+A = np.array([[0, 0, 1],[1, -1, 2],[-6, 0, -5]])
+B = np.array([[1],[2],[1]])
+C = np.array([[1, 1, 1]])
+D = np.array([[0]])
+
+sys = ss(A,B,C,D)
+Te = 1e-3
+#discretisation de (S)
+sysd = c2d(sys, Te)
+# Te etant la periode d’echantillonageegale a 1 ms
+#Calcul des matrices d’etat discretes
+Phi = sysd.A
+Gamma = sysd.B
+
+
+
+
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Sun Nov 22 07:49:06 2020
+
+@author: salihabdelaziz
+"""
+
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Nov 19 11:02:46 2020
+
+@author: salihabdelaziz
+"""
+
+# Press ⌃R to execute it or replace it with your code.
+# Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
+
+
+# TP 3 Observabilité et synthèse d'observateur
+# partie 2 : synthèse d'observateur pour des systèmes linéaiers continus
+
+
+import numpy as np
+import os
+from control.matlab import *
+import matplotlib.pyplot as plt  # MATLAB plotting functions
+
+
+# fonctin qui simule un système continu (à ne pas toucher)
+def system(t, u):
+    # Définition des matrices d'état
+    A = [[0., 0., 1.], [1., -1., 2.],[-6., 0., -5.]]
+    B = [[1.], [2.], [1.]]
+    C = [1., 1., 1.]
+    D = [0.]
+    # vecteur d'état initial
+    x0 = [[4.0], [-3.0], [1.0]]
+
+    # Calcul des valeurs propres et de la matrice de passage
+    valPropres, T = np.linalg.eig(A)
+
+    # les valeurs propres de A
+    lambda1 = valPropres[0]
+    lambda2 = valPropres[1]
+    lambda3 = valPropres[2]
+    
+     # La matrice diagonalisée de A
+    D = [[lambda1, 0., 0.], [0., lambda2, 0.],[0., 0., lambda3]]
+    
+    # Calcul de la matrice exponentiel e(At)
+    exp_Dt = [[np.exp(lambda1*t), 0., 0.], [0., np.exp(lambda2*t), 0.], [0., 0., np.exp(lambda3*t)]]
+    
+    # Ce calcul est expliqué dans le cours (slide 30) 
+    exp_At = T@exp_Dt@np.linalg.inv(T)
+    
+    ## calcul de la solution de l'équation différentielle (slide 26)
+    
+    # calcul de la solution homogène (slide 25)
+    xh = exp_At @ x0
+    
+    # calcul de la solution particulière (slide 26)
+    xp = -np.linalg.inv(A)@B + exp_At @ np.linalg.inv(A) @ B 
+    
+    # solution complète de l'équation détat
+    x = xh + xp
+    
+    # calcul de la sortie du système  
+    y = C @ x
+    
+    return y
+
+##############################################################################
+# La fonction observateur à mettre ici 
+def observateur(u, y, xhat) :
+    A = np.array([[0, 0, 1],[1, -1, 2],[-6, 0, -5]])
+    B = np.array([[1],[2],[1]])
+    C = np.array([[1, 1, 1]])
+    D = np.array([[0]])
+    
+    sys = ss(A,B,C,D)
+    Te = 1e-3
+    #discretisation de (S)
+    sysd = c2d(sys, Te)
+    # Te etant la periode d’echantillonageegale a 1 ms
+    #Calcul des matrices d’etat discretes
+    Phi = sysd.A
+    Gamma = sysd.B
+    
+    x = np.linalg.inv(C)@y
+    
+    x
+    
+    
+    
+    
+if __name__ == '__main__':  
+
+    # On simule le système pendant 10 s (= N*Te) 
+    # N est le nombre d'échantillon
+    N = 10000
+    
+    # définiton de la periode d'échantillonage
+    Te = 0.001
+    
+    # vecteurs et matrices de sauvegarde 
+    t = np.zeros(N)
+    yy = np.zeros(N)
+    xx_hat = np.zeros((3, N))
+    # vecteur d'état estimée à l'instant k = 0
+    
+    x_hat = [[0.], [0.], [0.]]
+    
+    # entrée echelon
+    u = 1.0
+    for i in range(0, N) :
+        y = system(Te*i, u)
+        yy[i]=y
+        t[i]=Te*i
+      
+       
+        plt.figure(1)
+        plt.plot(t,yy)
+        plt.legend(['y(t)', 'y(t)_estimé'])
+        plt.show()
