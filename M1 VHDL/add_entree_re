@@ -1,0 +1,60 @@
+----------------------------------------------------------------------------------
+-- Company: 
+-- Engineer: 
+-- 
+-- Create Date: 2023/10/27 17:02:47
+-- Design Name: 
+-- Module Name: add_entree_re - Behavioral
+-- Project Name: 
+-- Target Devices: 
+-- Tool Versions: 
+-- Description: 
+-- 
+-- Dependencies: 
+-- 
+-- Revision:
+-- Revision 0.01 - File Created
+-- Additional Comments:
+-- 
+----------------------------------------------------------------------------------
+
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+-- Uncomment the following library declaration if using
+-- arithmetic functions with Signed or Unsigned values
+--use IEEE.NUMERIC_STD.ALL;
+
+-- Uncomment the following library declaration if instantiating
+-- any Xilinx leaf cells in this code.
+--library UNISIM;
+--use UNISIM.VComponents.all;
+
+entity add_entree_re is
+    Port ( datain1 : in STD_LOGIC_VECTOR(3 downto 0);
+           datain2 : in STD_LOGIC_VECTOR(3 downto 0);
+           r : in STD_LOGIC;
+           rtoadd1 : out STD_LOGIC_VECTOR(3 downto 0);
+           rtoadd2 : out STD_LOGIC_VECTOR(3 downto 0));
+end add_entree_re;
+
+architecture Behavioral of add_entree_re is
+signal data1,data2 : STD_LOGIC_VECTOR(3 downto 0);
+
+begin
+ reg : process(datain1,datain2,r)
+ begin
+    if r = '1' then
+        data1 <= datain1;
+        data2 <= datain2;
+    else data1<= "0000";
+    data2<= "0000";
+    end if;
+ end process;
+rtoadd1<= data1;
+rtoadd2<= data2;    
+        
+                
+
+end Behavioral;
