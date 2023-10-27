@@ -1,0 +1,104 @@
+----------------------------------------------------------------------------------
+-- Company: 
+-- Engineer: 
+-- 
+-- Create Date: 2023/10/27 17:21:32
+-- Design Name: 
+-- Module Name: addtionneur_sm - Behavioral
+-- Project Name: 
+-- Target Devices: 
+-- Tool Versions: 
+-- Description: 
+-- 
+-- Dependencies: 
+-- 
+-- Revision:
+-- Revision 0.01 - File Created
+-- Additional Comments:
+-- 
+----------------------------------------------------------------------------------
+
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+-- Uncomment the following library declaration if using
+-- arithmetic functions with Signed or Unsigned values
+--use IEEE.NUMERIC_STD.ALL;
+
+-- Uncomment the following library declaration if instantiating
+-- any Xilinx leaf cells in this code.
+--library UNISIM;
+--use UNISIM.VComponents.all;
+
+entity addtionneur_sm is
+--  Port ( );
+end addtionneur_sm;
+
+architecture Behavioral of addtionneur_sm is
+component add_entree_re
+port ( datain1 : in STD_LOGIC_VECTOR(3 downto 0);
+       datain2 : in STD_LOGIC_VECTOR(3 downto 0);
+       r : in STD_LOGIC;
+       rtoadd1 : out STD_LOGIC_VECTOR(3 downto 0);
+       rtoadd2 : out STD_LOGIC_VECTOR(3 downto 0));
+end component;
+
+component additionneur
+port ( input1 : in STD_LOGIC_VECTOR(3 downto 0);
+       input2 : in STD_LOGIC_VECTOR(3 downto 0);
+       r : in STD_LOGIC;
+       output : out STD_LOGIC_VECTOR(3 downto 0));
+end component;
+
+component add_sortie_re
+port(  addtoreg : in STD_LOGIC_VECTOR(3 downto 0);
+       r : in STD_LOGIC;
+       Sortie : out STD_LOGIC_VECTOR(3 downto 0));
+end component;
+
+signal datain1,datain2,rtoadd1,rtoadd2,addtoreg,Sortie,input1,input2,output :STD_LOGIC_VECTOR(3 downto 0);
+signal r :STD_LOGIC;
+begin
+c1 : add_entree_re port map( datain1 => datain1,
+                             datain2 => datain2,
+                             r => r,
+                             rtoadd1 => rtoadd1,
+                             rtoadd2 => rtoadd2
+                             );
+
+c2 : additionneur port map( input1 =>input1,
+                           input2 =>input2,
+                           r => r,
+                           output =>output
+                           );
+                           
+c3 : add_sortie_re port map( addtoreg => addtoreg,
+                             r => r,
+                             Sortie => Sortie
+                             );
+                           
+
+p2 : process
+begin
+    r <= '0';
+    wait for 40 ns;
+    r <= '1';
+    wait for 120 ns;
+    r <= '0';
+    wait;    
+end process;
+
+p3 : process
+begin
+    datain1 <= "1111";datain2 <="0010";
+    wait for 80 ns;
+    datain1 <= "0011";datain2 <= "1100";
+    wait;
+end process;    
+
+input1 <=rtoadd1;
+input2 <=rtoadd2;
+addtoreg <= output;
+
+end Behavioral;
