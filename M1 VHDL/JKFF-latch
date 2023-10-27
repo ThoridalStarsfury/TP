@@ -18,7 +18,8 @@
 -- 
 ----------------------------------------------------------------------------------
 
-
+--La différence entre un verrou et une bascule est qu'un verrou est déclenché par niveau (les sorties peuvent changer dès que les entrées changent)
+--et que la bascule est déclenchée par front (ne change d'état que lorsqu'un signal de commande passe de haut en bas ou de bas en haut).
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
