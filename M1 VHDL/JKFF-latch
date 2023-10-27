@@ -1,0 +1,85 @@
+----------------------------------------------------------------------------------
+-- Company: 
+-- Engineer: 
+-- 
+-- Create Date: 2023/10/27 08:18:35
+-- Design Name: 
+-- Module Name: TPex2sm - Behavioral
+-- Project Name: 
+-- Target Devices: 
+-- Tool Versions: 
+-- Description: 
+-- 
+-- Dependencies: 
+-- 
+-- Revision:
+-- Revision 0.01 - File Created
+-- Additional Comments:
+-- 
+----------------------------------------------------------------------------------
+
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+-- Uncomment the following library declaration if using
+-- arithmetic functions with Signed or Unsigned values
+--use IEEE.NUMERIC_STD.ALL;
+
+-- Uncomment the following library declaration if instantiating
+-- any Xilinx leaf cells in this code.
+--library UNISIM;
+--use UNISIM.VComponents.all;
+
+entity TPex2sm is
+--  Port ( );
+end TPex2sm;
+
+architecture Behavioral of TPex2sm is
+component TP2ex2
+ Port (    S : in STD_LOGIC;
+           R : in STD_LOGIC;
+           ini : in STD_LOGIC;           
+           clk : in STD_LOGIC;
+           Q : out STD_LOGIC;
+           Qb : out STD_LOGIC);--Qb est Q bar
+end component;
+
+signal S,R,ini,clk,Q,Qb : STD_LOGIC;
+
+begin
+c1 : TP2ex2 port map(S,R,ini,clk,Q,Qb);
+
+horloge : process
+begin
+    clk <= '0';
+    wait for 10 ns;
+    clk <= '1';
+    wait for 10 ns;
+end process;
+
+Initialiser : process
+begin
+     ini <= '1';
+     wait for 10 ns;
+     ini <= '0';
+     wait;
+end process;
+
+JKFF : process
+begin
+      S <= '0';
+      R <= '0';
+      wait for 40 ns;
+      S <= '0';
+      R <= '1';
+      wait for 20 ns;
+      S <= '1';
+      R <= '0';
+      wait for 20 ns;
+      S <= '1';
+      R <= '1';
+      wait for 20 ns;
+end process;
+
+end Behavioral;
