@@ -1,0 +1,33 @@
+import control as crtl
+from scipy import signal
+
+import numpy as np
+import os
+from control.matlab import *
+import matplotlib.pyplot as plt  # MATLAB plotting functions
+
+deltat = 0.001
+
+A = np.array([[1,deltat],[0,1]])
+
+B = np.array([[deltat**2/2],[deltat]])
+
+
+
+N = 1000
+h = 500
+y = np.zeros((2,N))
+
+t = np.arange(0,N)
+u = np.ones(N)
+"""v = np.zeros(N)
+x = np.zeros(N)"""
+x[0] = 1
+x[h] = 10
+for k in range(0,h):
+    y[:,k+1]=A@y[:,k]+B@u[k]
+    """v[k+1] = 0
+    x[k+1] = x[k]
+    for k in range(h,N-1):
+        v[k+1] = 0
+        x[k+1] = x[k]"""
