@@ -1,0 +1,67 @@
+
+
+
+import control as crtl
+from scipy import signal
+
+import numpy as np
+import os
+from control.matlab import *
+import matplotlib.pyplot as plt  # MATLAB plotting functions
+
+deltat = 0.001
+
+A = np.array([[1,deltat],[0,1]])
+
+B = np.array([[deltat**2/2],[deltat]])
+
+hp = 1000
+
+h = 500
+
+hc = 5 #horizon de contrôle
+F = A
+matriceD = np.array([[0.]*2 for i in range(14)]) #initialiser la matrice D
+for m in range(0,14,2):
+    matriceD[m,:] = F[0,:] # On entre des valeurs de m-ième ligne 
+    matriceD[m+1,:] = F[1,:] # On entre des valeurs de m+1-ième ligne 
+    F = F@A
+    
+matriceE = np.array([[0.]*hc for i in range(14)]) #initialiser la matrice E
+D = B
+for a in range(0,14,2):# a-ième ligne
+    if a == 0:
+        matriceE[a,0] = B[0,:] # On entre des valeurs de premier mélement  
+        matriceE[a+1,0] = B[1,:] # On entre des valeurs de premier mélement
+    elif a < hc*2:
+        C = B
+        for b in range(a//2,-1,-1):# b-ième colonne et b <= a (a//2 est un nombre entier)
+            matriceE[a,b] = C[0,:] # On entre des valeurs de [a,b] élement
+            matriceE[a+1,b] = C[1,:] # On entre des valeurs de [a,b] élement
+            C = A@C
+    else:
+        D = A@D
+        E = D
+        for b in range(hc-1,-1,-1):
+            matriceE[a,b] = E[0,:] # On entre des valeurs de [a,b] élement
+            matriceE[a+1,b] = E[1,:] # On entre des valeurs de [a,b] élement
+            E = A@E
+
+matriceE_trans = np.array([[0.]*7 for i in range(hc*2)]) #initialiser la matrice E_trans
+D = B
+for a in range(0,10,2):# a-ième ligne
+    if a == 5:
+        matriceE_trans[a,0] = B[0,:] # On entre des valeurs de premier mélement  
+        matriceE_trans[a+1,0] = B[1,:] # On entre des valeurs de premier mélement
+    else:
+        C = B
+        for b in range(a//2,7,1):# b-ième colonne et b <= a (a//2 est un nombre entier)
+            matriceE_trans[a,b] = C[0,:] # On entre des valeurs de [a,b] élement
+            matriceE_trans[a+1,b] = C[1,:] # On entre des valeurs de [a,b] élement
+            C = A@C
+
+kphi = 1
+matrice_kphi = kphi*np.identity(14) #hp*2 
+
+kmu = 1
+matrice_kmu = kmu*np.identity(14) # 14=hp*2  
