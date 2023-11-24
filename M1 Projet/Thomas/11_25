@@ -1,0 +1,99 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Nov 23 17:42:23 2023
+
+@author: serroukha
+"""
+
+import numpy as np
+import matplotlib.pyplot as plt
+from math import *
+import numpy.linalg as alg
+
+
+dt = 0.001
+
+N = 10000
+
+
+s = np.zeros((2,N+1))
+x = np.zeros(N+1)
+v = np.zeros(N+1)
+f = np.ones((N+1,1))
+v[0]=10
+
+A = np.array([[1,dt],[0, 1]])
+B = np.array([[dt**2/2],[dt]])
+
+for i in range(N):
+    # x[i+1]= x[i]+dt*v[i] + (dt**2/2)*f[i]
+    # v[i+1]= v[i]+ dt*f[i]
+    s[:,i+1] =  np.dot(A,s[:,i]) + np.dot(B,f[i])
+    i=i+1
+
+t = np.linspace(0,N+1,N+1)
+
+print(x)
+plt.figure()
+plt.plot(t,s[0,:],'r')
+plt.title('x(k)')
+plt.grid('True')
+plt.show()
+
+print(v)
+plt.figure()
+plt.plot(t,s[1,:],'b')
+plt.title('v(k)')
+plt.grid('True')
+plt.show()
+
+
+A = np.array([[1,dt],[0, 1]])
+# Create an empty array
+my_array = A
+# Loop to append elements
+for i in range(2,N):
+    # Generate a new element
+    new_element = alg.matrix_power(A,i)
+    
+    # Append the new element to the array
+    my_array = np.concatenate((my_array, new_element))
+
+# Print the resulting array
+print(my_array)  
+
+# J(y,u,k) = u_trans(Ku + E_trans*Kgamma*E)u + 2 (Dy - Gamma_d)Kgamma*E*u
+# Q = Ku + E_trans*Kgamma*E
+# c = Dy - Gamma_d
+# K=1
+# Kg = 1
+# Kgamma = Kg*np.eye(1000)
+# Ku = K*np.eye(1000)
+# D = my_array
+# Dy = np.dot(D,s)
+# print(Dy)
+# KE = np.dot(Kgamma,E)
+# Et = np.transpose(E)
+# Q = Ku + np.dot(Et,KE)
+# c = np.dot(D,y) + Gamma_d
+
+# Qinv = alg.inv(Q)
+# u = np.dot(Qinv,c)
+
+# Calcul de la nouvelle trajetoire avec la commande u
+
+
+# y = np.zeros((2,N+1))
+
+# for i in range(N):
+#     y[:,i+1] =  np.dot(A,y[:,i]) + np.dot(B,u[i])
+#     i=i+1
+    
+    
+# print(x)
+# plt.figure()
+# plt.plot(t,y[0,:],'r')
+# plt.title('x(k)')
+# plt.grid('True')
+# plt.show()
