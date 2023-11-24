@@ -22,7 +22,7 @@ h = 500
 hc = 5 #horizon de contrôle
 F = A
 matriceD = np.array([[0.]*2 for i in range(14)]) #initialiser la matrice D
-for m in range(0,14,2):
+for m in range(0,14,2): # 14 est un exemple, on doit remplacer 14 par hp (1000)
     matriceD[m,:] = F[0,:] # On entre des valeurs de m-ième ligne 
     matriceD[m+1,:] = F[1,:] # On entre des valeurs de m+1-ième ligne 
     F = F@A
