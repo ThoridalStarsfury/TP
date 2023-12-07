@@ -1,0 +1,71 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Dec  7 10:02:22 2023
+
+@author: zhanpeng.xi@etu.umontpellier.fr
+"""
+
+import numpy as np
+import matplotlib.pyplot as plt
+from math import *
+
+def normalizeAngle(angle):
+    while angle >= np.pi:
+        angle -= 2.0 * np.pi
+    while angle < -np.pi:
+        angle += 2.0 * np.pi
+    return angle 
+
+def drawRobotMGD (th1, th2, color) :
+     point1 = [0, 0]
+     point2 = [a1*cos(th1), a1*sin(th1)]
+     point3 = [a1*cos(th1)+a2*cos(th2+th1), a1*sin(th1)+a2*sin(th2+th1)]
+     """point4 = [a1*cos(th1)+a2*cos(th2+th1)-0.04*sin(th1+th2), a1*sin(th1)+a2*sin(th2+th1)+0.04*cos(th1+th2)]
+     point5 = [a1*cos(th1)+a2*cos(th2+th1)-0.04*sin(th1+th2)+0.02*cos(th2+th1), a1*sin(th1)+a2*sin(th2+th1)+0.04*cos(th1+th2)+0.02*sin(th2+th1)]
+     point6 = [a1*cos(th1)+a2*cos(th2+th1)+0.04*sin(th1+th2), a1*sin(th1)+a2*sin(th2+th1)-0.04*cos(th1+th2)]
+     point7 = [a1*cos(th1)+a2*cos(th2+th1)+0.04*sin(th1+th2)+0.02*cos(th2+th1), a1*sin(th1)+a2*sin(th2+th1)-0.04*cos(th1+th2)+0.02*sin(th2+th1)]
+     x_values = [point1[0], point2[0], point3[0],point4[0],point5[0],point4[0],point6[0],point7[0]]
+     y_values = [point1[1], point2[1], point3[1],point4[1],point5[1],point4[1],point6[1],point7[1]]"""
+     x_values = [point1[0], point2[0], point3[0]]
+     y_values = [point1[1], point2[1], point3[1]]
+     plt.plot(x_values, y_values, color)
+     plt.gca().axis('equal')
+     plt.grid('on')
+     
+def calculateAndDrawRobotPose(w1,w2,th1Prev,th2Prev,col):#w
+    th1Cur = th1Prev + w1*dT
+    th2Cur = th2Prev + w2*dT
+    xCur =a1*cos(th1Cur)+a2*cos(th2Cur+th1Cur)
+    yCur =a1*sin(th1Cur)+a2*sin(th2Cur+th1Cur)
+    drawRobotMGD(th1Cur, th2Cur, 'r')
+    plt.plot(xCur, yCur, marker='o', markersize=1, color=col)
+    time = i*dT     
+    return (xCur,yCur,th1Cur,th2Cur)
+    
+
+
+
+
+     
+if __name__ =='__main__':
+    N = 100
+    a1=0.6 #robot size
+    a2=0.4
+    th1 = np.zeros(N+1)
+    th2 = np.zeros(N+1)
+    x = np.zeros(N+1)
+    y = np.zeros(N+1)
+    #q = np.zeros((N+1,2))
+    th1[0] = np.pi/6
+    th2[0] = np.pi/8
+    x[0] = a1*cos(th1[0])+a2*cos(th2[0]+th1[0])
+    y[0] = a1*sin(th1[0])+a2*sin(th2[0]+th1[0])
+    q1 = 7
+    q2 = q1*2
+    dT = 0.01 #seconds
+    #loop
+    for i in range(1,N+1):
+         x[i],y[i],th1[i],th2[i] = calculateAndDrawRobotPose(q1,q2,th1[i-1],th2[i-1],'b')
+    drawRobotMGD(th1[0],th2[0], 'k')
+    drawRobotMGD (th1[i], th2[i], 'g')
