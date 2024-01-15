@@ -19,6 +19,7 @@ import math
 from scipy import integrate
 import scipy as sc
 import control as crtl
+from matplotlib.animation import FuncAnimation
 
 # Use a breakpoint in the code line below to debug your script.
 M = 3.2         # Masse du chariot
@@ -34,7 +35,8 @@ n2 = -52.27     # Capteur d'angle [V/rd]
 n3 = -7.64      # Capteur de vitesse [V/m/s]
 n4 = -52.27     # Capteur de vitesse angulaire [V/rd/s]
 Ks= Kf*1.;        # Coefficient de friction in N
-gs= -44.29
+gs= -44.29  # Gain pour avoir un gain statique de la boucle fermée égal à 1
+rd = 0.2  #le déplacement désiré du chariot
 
 
 # définition des matrices d'état du système linéarisé
@@ -96,21 +98,19 @@ dxx[3, 0] = x[3, 0]
 # initialisation du vecteur d'état estimé et de la commande
 x_hat = np.zeros((5, 1))
 u = 0.
-xx_hat = np.zeros((5, N))
+xx_hat = np.zeros((5, N)) #pour stocker l'état estimé dans la matrice xx_hat
 
-def observateur(u, y, xhat) :
-    
-    Te = 1e-3
+x_values = np.zeros(N)
+y_values = np.zeros(N)
 
-    # Te etant la periode d’echantillonageegale a 1 ms
 
-    #Calcul des matrices d’etat discretes
-    
+# Create a figure and axis
+fig, ax = plt.subplots()
+points, = ax.plot([], [], 'b')  # 'bo' means blue color, round markers
 
-    xnext_hat = Ad@xhat+Bd*u+Ld@(y-Cd@xhat)
-    
-
-    return xnext_hat
+# Set the axis limits
+ax.set_xlim(0, 0.8)
+ax.set_ylim(-0.2, 0.2)
 
 
 ##############################################################################
@@ -154,20 +154,19 @@ def pendule_MNL(u, i):
 
 def observateur(u, y, xhat) :
   
-  Te = 1e-3
-
-  # Te etant la periode d’echantillonageegale a 1 ms
-
-  #Calcul des matrices d’etat discretes
-    
-
-  xnext_hat = Acd@xhat+Bcd*u+Ld@(y-Ccd@xhat)
-    
-
-  return xnext_hat
-   
+    Te = 1e-3
     
+    # Te etant la periode d’echantillonageegale a 1 ms
 
+    #Calcul des matrices d’etat discretes     
+    xnext_hat = Acd@xhat+Bcd*u+Ld@(y-Ccd@xhat)
+ 
+    return xnext_hat
+   
+# Update function for the animation
+def update(frame):
+    points.set_data(x_values[:frame], y_values[:frame])  # Update data for each frame
+    return points,
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':  
@@ -248,7 +247,6 @@ if __name__ == '__main__':
     K = place(Ad,Bd,PSd)
     print("\nla matrice K est\n",K)
     
-
     
     for i in range(0, N) :
         
@@ -256,14 +254,18 @@ if __name__ == '__main__':
         y = pendule_MNL(u, i)
 
         # Question 7 : Appel de l'observateur
-        xnext_hat = observateur(u,y,x_hat) 
+        x_hat = observateur(u,y,x_hat) 
         
         # Question 9 :  Calcul de la commande
-        u = us+ ur
+        us = x_hat[4]/Kf
+        ur = -K@x_hat[0:4,0] + gs*rd
         
-        us = 
+        u = us[0, 0] + ur[0, 0] # donc "u" est un nombre flottant
+    
+        x_values[i] = x_hat[0, 0]+l*cos(x_hat[1,0])
+        y_values[i] = l*sin(x_hat[1,0])
+       
 
-        
         ###################################################
         # Sauvegarde des données
         xx_hat[0, i]=x_hat[0]
@@ -278,6 +280,15 @@ if __name__ == '__main__':
         
         t[i]=Te*i
         
+    # Create the animation
+    animation = FuncAnimation(fig, update, frames=range(0, len(xx_hat[0, :]), 10), interval = 50, blit=True)
+
+    # Save the animation as a video file (e.g., MP4)
+    animation.save('point_animation.gif', writer='ffmpeg', fps=30)
+
+    # Display the animation (optional)
+    plt.figure()
+    plt.show()    
     
     
     
